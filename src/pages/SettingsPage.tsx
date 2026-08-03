@@ -32,7 +32,7 @@ export function SettingsPage() {
   }, [])
   if (state.loading) return <LoadingState />
   if (state.error || !state.data || !auth.profile) return <ErrorState message={state.error ?? 'Indstillingerne kunne ikke hentes.'} onRetry={() => void state.reload()} />
-  async function changeRole(values: { reason: string; internalNote?: string; newRole?: UserRole }) {
+  async function changeRole(values: { reason?: string; internalNote?: string; newRole?: UserRole }) {
     if (!selected || !values.newRole) return
     await performModerationAction({ action: 'change_user_role', targetUserId: selected.id, ...values })
     showToast('Brugerrollen er ændret.')

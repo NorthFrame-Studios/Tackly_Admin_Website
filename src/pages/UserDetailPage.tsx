@@ -32,7 +32,7 @@ export function UserDetailPage() {
   if (state.loading) return <LoadingState label="Henter bruger…" />
   if (state.error || !state.data) return <ErrorState message={state.error ?? 'Brugeren kunne ikke hentes.'} onRetry={() => void state.reload()} />
   const { user } = state.data
-  async function confirm(values: { reason: string; internalNote?: string; suspensionHours?: number; newRole?: UserRole }) {
+  async function confirm(values: { reason?: string; internalNote?: string; suspensionHours?: number; newRole?: UserRole }) {
     if (!action) return
     await performModerationAction({ action, ...values, targetUserId: user.id })
     const labels: Partial<Record<ModerationActionType, string>> = { warn_user: 'Advarslen er registreret.', suspend_user: 'Brugeren er blevet suspenderet.', unsuspend_user: 'Suspenderingen er ophævet.', ban_user: 'Brugeren er blevet udelukket.', change_user_role: 'Brugerrollen er ændret.' }

@@ -26,7 +26,7 @@ export function ListingDetailPage() {
   if (state.loading) return <LoadingState label="Henter annonce…" />
   if (state.error || !state.data) return <ErrorState message={state.error ?? 'Annoncen kunne ikke hentes.'} onRetry={() => void state.reload()} />
   const { listing } = state.data
-  async function confirm(values: { reason: string; internalNote?: string }) {
+  async function confirm(values: { reason?: string; internalNote?: string }) {
     if (!selection) return
     await performModerationAction({ action: selection.action, ...values, listingId: listing.id, listingImageId: selection.image?.id, targetUserId: listing.seller_id })
     showToast(selection.action === 'remove_listing' ? 'Annoncen er blevet fjernet.' : selection.action === 'restore_listing' ? 'Annoncen er blevet gendannet.' : selection.action === 'hide_image' ? 'Billedet er blevet skjult.' : 'Billedet er blevet gendannet.')

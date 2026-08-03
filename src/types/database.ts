@@ -11,6 +11,7 @@ export type ListingStatus =
   | 'removed_by_moderator'
   | 'deleted_by_owner'
 export type ListingImageStatus = 'active' | 'hidden' | 'removed'
+export type SupportCaseStatus = 'new' | 'open' | 'waiting_for_user' | 'resolved' | 'closed'
 export type ModerationActionType =
   | 'dismiss_report'
   | 'mark_under_review'
@@ -94,6 +95,7 @@ export interface Report {
   listing_id: string | null
   listing_image_id: string | null
   message_id: string | null
+  conversation_id: string | null
   reason: string
   details: string | null
   status: ReportStatus
@@ -108,7 +110,69 @@ export interface Report {
   assigned_admin?: PublicProfile | null
   listing?: Listing | null
   listing_image?: ListingImage | null
-  message?: { id: string; sender_id: string; content: string; created_at: string } | null
+  message?: { id: string; conversation_id: string; sender_id: string; content: string; created_at: string } | null
+}
+
+export interface ConversationMessage {
+  id: string
+  conversation_id: string
+  sender_id: string
+  content: string
+  message_type: string
+  created_at: string
+  read_at: string | null
+}
+
+export interface ConversationContext {
+  id: string
+  listing_id: string
+  buyer_id: string
+  seller_id: string
+  created_at: string
+  updated_at: string
+  buyer: PublicProfile | null
+  seller: PublicProfile | null
+  listing: Pick<Listing, 'id' | 'title' | 'status'> | null
+  messages: ConversationMessage[]
+}
+
+export interface SupportMessage {
+  id: string
+  case_id: string
+  sender_id: string
+  body: string
+  is_internal: boolean
+  created_at: string
+  sender?: PublicProfile | null
+}
+
+export interface SupportCaseEvent {
+  id: string
+  case_id: string
+  actor_id: string
+  event_type: string
+  metadata: Record<string, unknown> | null
+  created_at: string
+  actor?: PublicProfile | null
+}
+
+export interface SupportCase {
+  id: string
+  user_id: string
+  subject: string
+  category: string
+  status: SupportCaseStatus
+  priority: ReportPriority
+  assigned_admin_id: string | null
+  created_at: string
+  updated_at: string
+  last_message_at: string
+  resolved_at: string | null
+  user?: PublicProfile | null
+  assigned_admin?: PublicProfile | null
+  messages?: SupportMessage[]
+  events?: SupportCaseEvent[]
+  message_count?: number
 }
 
 export interface ModerationAction {
@@ -148,7 +212,7 @@ export interface PaginationResult<T> {
 
 export interface ModerationActionInput {
   action: ModerationActionType
-  reason: string
+  reason?: string
   internalNote?: string
   reportId?: string
   targetUserId?: string

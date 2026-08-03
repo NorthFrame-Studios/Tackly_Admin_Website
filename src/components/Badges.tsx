@@ -1,8 +1,8 @@
 import type { AccountStatus, ReportPriority, ReportStatus, UserRole } from '../types/database'
-import { accountStatusLabel, listingStatusLabel, priorityLabel, reportStatusLabel, roleLabel } from '../utils/format'
+import { accountStatusLabel, listingStatusLabel, priorityLabel, reportStatusLabel, roleLabel, supportStatusLabel } from '../utils/format'
 
 export function StatusBadge({ status }: { status: ReportStatus | AccountStatus | string }) {
-  const label = reportStatusLabel[status as ReportStatus] ?? accountStatusLabel[status as AccountStatus] ?? listingStatusLabel[status] ?? status
+  const label = reportStatusLabel[status as ReportStatus] ?? accountStatusLabel[status as AccountStatus] ?? supportStatusLabel[status as keyof typeof supportStatusLabel] ?? listingStatusLabel[status] ?? status
   return <span className={`badge badge--${status}`}>{label}</span>
 }
 

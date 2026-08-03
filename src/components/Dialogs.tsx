@@ -2,6 +2,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { LoaderCircle, X } from 'lucide-react'
 import { useState } from 'react'
 import { getErrorMessage } from '../lib/errors'
+import { requiresModerationReason } from '../services/moderationService'
 import type { ModerationActionInput, ModerationActionType, UserRole } from '../types/database'
 import { actionLabel } from '../utils/format'
 
@@ -27,6 +28,7 @@ export function ActionDialog({ open, onOpenChange, action, targetLabel, initialR
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const destructive = destructiveActions.has(action)
+  const reasonRequired = requiresModerationReason(action)
 
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
@@ -41,7 +43,7 @@ export function ActionDialog({ open, onOpenChange, action, targetLabel, initialR
 
   async function submit(event: React.FormEvent) {
     event.preventDefault()
-    if (reason.trim().length < 3 || (destructive && !confirmed)) return
+    if ((reasonRequired && reason.trim().length < 3) || (destructive && !confirmed)) return
     setSubmitting(true)
     setError(null)
     try {
@@ -75,8 +77,8 @@ export function ActionDialog({ open, onOpenChange, action, targetLabel, initialR
           </div>
           <form onSubmit={submit} className="form-stack">
             <label className="field">
-              <span>Begrundelse <em>påkrævet</em></span>
-              <textarea value={reason} onChange={(event) => setReason(event.target.value)} minLength={3} maxLength={1000} required rows={4} autoFocus placeholder="Beskriv den konkrete årsag…" />
+              <span>Begrundelse {reasonRequired ? <em>påkrævet</em> : <small>valgfri</small>}</span>
+              <textarea value={reason} onChange={(event) => setReason(event.target.value)} minLength={reasonRequired ? 3 : undefined} maxLength={1000} required={reasonRequired} rows={4} autoFocus placeholder={reasonRequired ? 'Beskriv den konkrete årsag…' : 'Tilføj eventuelt en forklaring…'} />
             </label>
             <label className="field">
               <span>Intern note <small>valgfri</small></span>
@@ -94,7 +96,7 @@ export function ActionDialog({ open, onOpenChange, action, targetLabel, initialR
             {error && <p className="form-error" role="alert">{error}</p>}
             <div className="dialog-actions">
               <Dialog.Close type="button" className="button button--secondary">Annuller</Dialog.Close>
-              <button type="submit" className={`button ${destructive ? 'button--danger' : 'button--primary'}`} disabled={submitting || reason.trim().length < 3 || (destructive && !confirmed)}>
+              <button type="submit" className={`button ${destructive ? 'button--danger' : 'button--primary'}`} disabled={submitting || (reasonRequired && reason.trim().length < 3) || (destructive && !confirmed)}>
                 {submitting && <LoaderCircle className="spin" size={17} />}
                 Bekræft handling
               </button>

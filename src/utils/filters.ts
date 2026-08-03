@@ -15,7 +15,7 @@ export function filterReports(reports: Report[], filters: ReportFilterValues): R
       (filters.type === 'listing' && Boolean(report.listing_id)) ||
       (filters.type === 'user' && Boolean(report.reported_user_id)) ||
       (filters.type === 'image' && Boolean(report.listing_image_id)) ||
-      (filters.type === 'message' && Boolean(report.message_id))
+      (filters.type === 'message' && Boolean(report.message_id || report.conversation_id))
     const haystack = [
       report.id,
       report.reason,
@@ -38,6 +38,7 @@ export function filterReports(reports: Report[], filters: ReportFilterValues): R
 
 export function getReportType(report: Report): string {
   if (report.message_id) return 'Besked'
+  if (report.conversation_id) return 'Samtale'
   if (report.listing_image_id) return 'Billede'
   if (report.listing_id) return 'Annonce'
   if (report.reported_user_id) return 'Bruger'

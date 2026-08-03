@@ -9,6 +9,8 @@ Separat administrations- og moderationsapp til Equilos danske peer-to-peer-marke
 - Oversigt med virkelige markeds- og moderationsmålinger
 - Filtrerbare anmeldelser, annoncer, brugere og auditlog
 - Detaljerede sagsforløb med billeder, beskeder, historik og interne noter
+- Komplet chatkontekst ved samtaleanmeldelser, inklusive tydelig markering af den anmeldte besked
+- Fælles supportindbakke med beskedtråde, interne noter, tildeling, prioritet og status
 - Beskyttede handlinger til afvisning, billedskjulning, annoncefjernelse, advarsler, suspension, udelukkelse og rolleændring
 - Responsive desktop-, tablet- og mobilvisninger
 - Danske tekster, tilgængelige dialoger, tastaturnavigation samt loading-, fejl- og tomtilstande
@@ -39,6 +41,8 @@ VITE_SUPABASE_ANON_KEY=<publishable-eller-anon-key>
 
 Brug URL og publishable/anon key fra mobilappens `EXPO_PUBLIC_SUPABASE_URL` og `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Variabelnavnene er forskellige, men værdierne skal pege på samme projekt. En service-role key må aldrig bruges i Vite eller Vercel.
 
+Ved lokal udvikling accepterer Vite-konfigurationen også de eksisterende `EXPO_PUBLIC_*`-navne som kompatibilitetsfallback. Vercel og nye installationer bør bruge `VITE_*`-navnene ovenfor.
+
 ## Supabase-migrationer
 
 Migrationerne ligger i [supabase/migrations](./supabase/migrations) og skal køres i filnavnsrækkefølge:
@@ -46,6 +50,8 @@ Migrationerne ligger i [supabase/migrations](./supabase/migrations) og skal kør
 1. `20260803100000_admin_core_schema.sql` – roller, kontostatus, rapporter, moderation, billedstatus og indekser.
 2. `20260803101000_admin_security_rls.sql` – rollehelpers, kolonnebeskyttelse, RLS, write guards og uforanderlig auditlog.
 3. `20260803102000_admin_rpc_and_audit.sql` – beskyttede læse-RPC'er og den atomiske moderations-RPC.
+4. `20260803103000_fix_admin_user_count_ambiguity.sql` – kvalificerer en tvetydig resultatkolonne i bruger-RPC'en.
+5. `20260803104000_support_and_conversation_reports.sql` – supportsager, supportbeskeder, uforanderlig sagslog, samtalekontekst på anmeldelser, RLS og beskyttede support-RPC'er.
 
 De kan køres via Supabase Dashboardens SQL Editor eller et linket Supabase CLI-projekt. Tag altid backup, gennemgå migrationerne mod produktionsschemaet og afprøv dem i staging først.
 
@@ -105,6 +111,8 @@ npm run preview      # lokal preview af dist/
 - Frontend bruger kun publishable/anon key og en autentificeret brugers JWT.
 - `get_my_admin_profile` afviser alle andre end aktive moderatorer og administratorer.
 - Rapportdata og interne noter er staff-only via RLS/beskyttede RPC'er.
+- Hele markedssamtaler kan læses af staff til moderationsformål; normale brugere kan fortsat kun læse samtaler, de selv deltager i.
+- Support oprettes og besvares gennem beskyttede RPC'er. Brugere kan kun se egne sager og aldrig interne noter eller sagslog.
 - Følsomme profilkolonner kan ikke læses eller ændres direkte af almindelige brugere.
 - Alle mutationer går gennem `perform_moderation_action`, som verificerer rolle, validerer input, ændrer data og skriver auditpost i samme transaktion.
 - Suspension, udelukkelse og rolleændring kræver administratorrolle.
@@ -123,8 +131,8 @@ Workspace-gennemgangen fandt mobilappen i søsterprojektet `ridegrej` og verific
 - E-mail ligger i `auth.users`, ikke `profiles`, og udleveres kun gennem staff-beskyttede RPC'er.
 - `listings.status` havde `active`, `reserved`, `sold` og `archived`; migrationen bevarer dem og tilføjer moderationsstatusser.
 - Billeder ligger i `listing_images` med `storage_path`. `moderation_status` er tilføjet, og RLS skjuler modererede billeder fra normale forespørgsler.
-- Det eksisterende rapportflow åbner en e-mail til support. `reports` er nyt; mobilappen skal senere ændres separat, hvis nye anmeldelser skal skrives direkte til tabellen.
-- Der findes intet supportticketsystem. Supportsiden viser derfor en ærlig tomtilstand og den nuværende e-mailarbejdsgang.
+- Mobilappen skriver allerede bruger- og annonceanmeldelser til `reports`. Den skal sende `conversation_id` ved chatanmeldelser for at bevare hele samtalekonteksten; ældre beskedrapporter findes fortsat via `message_id`.
+- Der fandtes ikke et supportticketsystem. Migration `104000` tilføjer det uden at ændre eksisterende markedsdata; mobilappen skal skifte fra `mailto:` til de nye support-RPC'er, før brugere kan oprette sager i adminindbakken.
 - “Seneste aktivitet” bruger Supabase Auths `last_sign_in_at`, fordi schemaet ikke har et samlet aktivitetsfelt.
 - Ingen genererede Supabase TypeScript-typer fandtes. Lokale interfaces følger de verificerede tabeller og migrationsfelter.
 
@@ -132,6 +140,8 @@ Workspace-gennemgangen fandt mobilappen i søsterprojektet `ridegrej` og verific
 
 - Migrationerne er leveret, men køres bevidst ikke automatisk mod produktionsdatabasen.
 - Eksisterende e-mailanmeldelser importeres ikke automatisk til `reports`.
+- Eksisterende supportmails importeres ikke automatisk til `support_cases`.
+- Support og samtalekontekst kræver den beskrevne mobilapp-integration; adminappen er klar til dataene, men dette repository ændrer ikke søsterprojektet automatisk.
 - Brugere får en struktureret advarselspost i `user_warnings`; mobilappen viser den først, når den senere integrerer tabellen.
 - De fælles begrundelsesskabeloner er read-only systemforslag. Ændringer kræver en versionsstyret kodeændring.
 - `listing-images` er i mobilappen en offentlig Storage bucket. Billedmoderation er derfor en logisk skjulning i alle databasebaserede visninger; en allerede kendt offentlig fil-URL tilbagekaldes ikke. Fuld URL-tilbagekaldelse kræver en separat migrering til private objekter/signerede URL'er i både mobil- og admin-app.

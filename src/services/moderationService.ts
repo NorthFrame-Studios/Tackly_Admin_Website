@@ -2,8 +2,20 @@ import { supabase } from '../lib/supabase'
 import type {
   ModerationAction,
   ModerationActionInput,
+  ModerationActionType,
   PaginationResult,
 } from '../types/database'
+
+const optionalReasonDefaults: Partial<Record<ModerationActionType, string>> = {
+  mark_under_review: 'Sagen er taget under behandling.',
+  restore_image: 'Billedet er gendannet.',
+  restore_listing: 'Annoncen er gendannet.',
+  unsuspend_user: 'Suspenderingen er ophævet.',
+}
+
+export function requiresModerationReason(action: ModerationActionType): boolean {
+  return !optionalReasonDefaults[action]
+}
 
 export interface ModerationFilters {
   action?: string
@@ -46,9 +58,13 @@ export async function getModerationActions(
 }
 
 export async function performModerationAction(input: ModerationActionInput): Promise<void> {
+  const reason = input.reason?.trim() || optionalReasonDefaults[input.action]
+  if (!reason || reason.length < 3) {
+    throw new Error('Tilføj en begrundelse for handlingen.')
+  }
   const { error } = await supabase.rpc('perform_moderation_action', {
     p_action: input.action,
-    p_reason: input.reason.trim(),
+    p_reason: reason,
     p_internal_note: input.internalNote?.trim() || null,
     p_report_id: input.reportId ?? null,
     p_target_user_id: input.targetUserId ?? null,

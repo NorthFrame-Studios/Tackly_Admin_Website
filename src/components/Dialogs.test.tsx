@@ -25,4 +25,14 @@ describe('ActionDialog', () => {
     await user.click(screen.getByRole('button', { name: 'Bekræft handling' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Databasefejl')
   })
+
+  it('tillader arbejdsgangshandlinger uden en manuel begrundelse', async () => {
+    const user = userEvent.setup()
+    const onConfirm = vi.fn().mockResolvedValue(undefined)
+    render(<ActionDialog open onOpenChange={vi.fn()} action="restore_listing" onConfirm={onConfirm} />)
+    const reason = screen.getByLabelText(/Begrundelse/)
+    expect(reason).not.toBeRequired()
+    await user.click(screen.getByRole('button', { name: 'Bekræft handling' }))
+    expect(onConfirm).toHaveBeenCalledWith(expect.objectContaining({ reason: '' }))
+  })
 })

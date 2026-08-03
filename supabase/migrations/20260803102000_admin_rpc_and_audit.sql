@@ -93,8 +93,8 @@ begin
       and (p_from is null or p.created_at >= p_from)
       and (p_to is null or p.created_at <= p_to)
   ), filtered as (
-    select * from user_rows
-    where not p_reported_only or reports_received_count > 0
+    select user_row.* from user_rows user_row
+    where not p_reported_only or user_row.reports_received_count > 0
   )
   select f.*, count(*) over() as total_count
   from filtered f

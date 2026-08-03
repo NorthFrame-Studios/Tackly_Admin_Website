@@ -43,6 +43,34 @@ export const priorityLabel = {
   urgent: 'Kritisk',
 } as const
 
+export const supportStatusLabel = {
+  new: 'Ny',
+  open: 'Åben',
+  waiting_for_user: 'Afventer bruger',
+  resolved: 'Løst',
+  closed: 'Lukket',
+} as const
+
+export const supportCategoryLabel: Record<string, string> = {
+  account: 'Konto',
+  listing: 'Annonce',
+  trade: 'Handel',
+  messages: 'Beskeder',
+  technical: 'Teknisk problem',
+  feedback: 'Feedback',
+  other: 'Andet',
+}
+
+export const supportEventLabel: Record<string, string> = {
+  created: 'Sagen blev oprettet',
+  user_replied: 'Brugeren svarede',
+  staff_replied: 'Support svarede',
+  internal_note: 'Intern note tilføjet',
+  status_changed: 'Status ændret',
+  priority_changed: 'Prioritet ændret',
+  assigned: 'Ansvarlig ændret',
+}
+
 export const listingStatusLabel: Record<string, string> = {
   active: 'Aktiv',
   reserved: 'Reserveret',

@@ -5,6 +5,7 @@ import type {
   ListingImage,
   ReportPriority,
   ReportStatus,
+  ConversationContext,
 } from '../types/database'
 
 const reportSelect = `
@@ -18,7 +19,7 @@ const reportSelect = `
     images:listing_images(*)
   ),
   listing_image:listing_images!reports_listing_image_id_fkey(*),
-  message:messages!reports_message_id_fkey(id, sender_id, content, created_at)
+  message:messages!reports_message_id_fkey(id, conversation_id, sender_id, content, created_at)
 `
 
 export interface ReportQuery {
@@ -93,6 +94,36 @@ export async function getReportById(reportId: string): Promise<Report> {
   if (error) throw error
   if (!data) throw new Error('Anmeldelsen findes ikke.')
   return hydrateReport(data as unknown as Report)
+}
+
+export async function getReportConversation(report: Report): Promise<ConversationContext | null> {
+  const conversationId = report.conversation_id ?? report.message?.conversation_id
+  if (!conversationId) return null
+
+  const [conversationResult, messagesResult] = await Promise.all([
+    supabase
+      .from('conversations')
+      .select(`
+        id, listing_id, buyer_id, seller_id, created_at, updated_at,
+        buyer:profiles!conversations_buyer_id_fkey(id, display_name, avatar_url, location),
+        seller:profiles!conversations_seller_id_fkey(id, display_name, avatar_url, location),
+        listing:listings!conversations_listing_id_fkey(id, title, status)
+      `)
+      .eq('id', conversationId)
+      .maybeSingle(),
+    supabase
+      .from('messages')
+      .select('id, conversation_id, sender_id, content, message_type, created_at, read_at')
+      .eq('conversation_id', conversationId)
+      .order('created_at', { ascending: true }),
+  ])
+  if (conversationResult.error) throw conversationResult.error
+  if (messagesResult.error) throw messagesResult.error
+  if (!conversationResult.data) return null
+  return {
+    ...(conversationResult.data as unknown as Omit<ConversationContext, 'messages'>),
+    messages: (messagesResult.data ?? []) as ConversationContext['messages'],
+  }
 }
 
 export async function getRelatedReports(userId: string, excludeId?: string): Promise<Report[]> {
