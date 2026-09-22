@@ -35,7 +35,7 @@ export async function getCurrentAdminProfile(): Promise<AdminProfile> {
   }
   const profile = Array.isArray(data) ? data[0] : data
   if (!profile || !isStaffRole(profile.role)) {
-    throw new Error('Du har ikke adgang til Equilo Admin.')
+    throw new Error('Du har ikke adgang til Tackly Admin.')
   }
   if (profile.account_status !== 'active') {
     throw new Error('Din administratorkonto er ikke aktiv.')

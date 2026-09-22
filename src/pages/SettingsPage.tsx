@@ -14,7 +14,7 @@ import { getUsers } from '../services/userService'
 import type { AdminUser, UserRole } from '../types/database'
 
 const reasonTemplates = [
-  'Indholdet overtræder Equilos retningslinjer.',
+  'Indholdet overtræder Tacklys retningslinjer.',
   'Annoncen er vildledende eller mangler væsentlige oplysninger.',
   'Der er dokumenteret mistanke om svindel.',
   'Sagen er gennemgået, og anmeldelsen kan ikke bekræftes.',

@@ -1,10 +1,10 @@
-# Prompt til Codex i Equilo-mobilappen
+# Prompt til Codex i Tackly-mobilappen
 
 Kopiér hele prompten herunder til Codex, mens mobilappens repository `ridegrej` er åbent:
 
 ---
 
-Implementér den resterende integration mellem Equilo-mobilappen og den eksisterende Equilo Admin-app. Inspicér hele mobilprojektet og dets Supabase-typer, services, routes og migrations før ændringer. Bevar eksisterende designmønstre og ændr ikke admin-repositoryet.
+Implementér den resterende integration mellem Tackly-mobilappen og den eksisterende Tackly Admin-app. Inspicér hele mobilprojektet og dets Supabase-typer, services, routes og migrations før ændringer. Bevar eksisterende designmønstre og ændr ikke admin-repositoryet.
 
 Admin-repositoryet har tilføjet migrationen `20260803104000_support_and_conversation_reports.sql` til samme Supabase-projekt. Den opretter følgende sikre backend-kontrakt:
 

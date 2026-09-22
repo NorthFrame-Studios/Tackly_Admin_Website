@@ -1,6 +1,6 @@
-# Equilo Admin
+# Tackly Admin
 
-Separat administrations- og moderationsapp til Equilos danske peer-to-peer-markedsplads for hesteudstyr. Appen er beregnet til `admin.equilo.dk` og bruger samme Supabase-projekt som Equilos Expo/React Native-app.
+Separat administrations- og moderationsapp til Tacklys danske peer-to-peer-markedsplads for hesteudstyr. Appen er beregnet til `admin.equilo.dk` og bruger samme Supabase-projekt som Tacklys Expo/React Native-app.
 
 ## Funktioner
 
@@ -101,7 +101,7 @@ npm run preview      # lokal preview af dist/
 3. Tilføj `VITE_SUPABASE_URL` og `VITE_SUPABASE_ANON_KEY` som Production/Preview environment variables.
 4. Deploy og kontrollér login samt direkte refresh på detaljeruter.
 5. Tilføj `admin.equilo.dk` under projektets Domains.
-6. Opret præcis den DNS-record, Vercel viser hos Equilos DNS-udbyder. DNS ændres ikke af dette projekt.
+6. Opret præcis den DNS-record, Vercel viser hos Tacklys DNS-udbyder. DNS ændres ikke af dette projekt.
 7. Kontrollér HTTPS, Supabase Auths tilladte site/redirect URLs og logout efter DNS er aktiv.
 
 `vercel.json` sender direkte requests som `/reports/:reportId`, `/users/:userId` og `/listings/:listingId` til SPA-entrypointet.
@@ -123,7 +123,7 @@ npm run preview      # lokal preview af dist/
 
 Kør Supabase Security Advisor og gennemgå eksisterende policies efter migration i staging. Rotér nøgler ved mistanke om læk; en service-role key må aldrig placeres i klientmiljøet.
 
-## Tilpasning til det eksisterende Equilo-schema
+## Tilpasning til det eksisterende Tackly-schema
 
 Workspace-gennemgangen fandt mobilappen i søsterprojektet `ridegrej` og verificerede det aktive REST-schema med den eksisterende publishable key.
 

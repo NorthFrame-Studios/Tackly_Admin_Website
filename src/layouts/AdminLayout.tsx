@@ -40,7 +40,7 @@ export function AdminLayout() {
     <div className="admin-shell">
       {mobileOpen && <button type="button" className="sidebar-scrim" aria-label="Luk menu" onClick={() => setMobileOpen(false)} />}
       <aside className={`sidebar ${mobileOpen ? 'sidebar--open' : ''}`}>
-        <div className="sidebar__brand"><Link to="/" onClick={() => setMobileOpen(false)}><EquiloMark /><div><strong>equilo</strong><span>Administration</span></div></Link><button type="button" className="icon-button sidebar__close" aria-label="Luk menu" onClick={() => setMobileOpen(false)}><X /></button></div>
+        <div className="sidebar__brand"><Link to="/" onClick={() => setMobileOpen(false)}><EquiloMark /><div><strong>tackly</strong><span>Administration</span></div></Link><button type="button" className="icon-button sidebar__close" aria-label="Luk menu" onClick={() => setMobileOpen(false)}><X /></button></div>
         <nav aria-label="Primær navigation">
           {navItems.map(({ to, label, icon: Icon }) => <NavLink key={to} to={to} end={to === '/'} onClick={() => setMobileOpen(false)}><Icon aria-hidden="true" /><span>{label}</span></NavLink>)}
           {isAdmin && <NavLink to="/settings" onClick={() => setMobileOpen(false)}><Settings aria-hidden="true" /><span>Indstillinger</span></NavLink>}
@@ -50,7 +50,7 @@ export function AdminLayout() {
       <div className="admin-main">
         <header className="topbar">
           <button type="button" className="icon-button menu-button" aria-label="Åbn menu" aria-expanded={mobileOpen} onClick={() => setMobileOpen(true)}><Menu /></button>
-          <nav className="breadcrumbs" aria-label="Brødkrummer"><Link to="/">Equilo Admin</Link>{segments.map((segment, index) => <span key={`${segment}-${index}`}><ChevronRight />{index === 0 && pageNames[segment] ? pageNames[segment] : index === 1 ? 'Detaljer' : segment}</span>)}</nav>
+          <nav className="breadcrumbs" aria-label="Brødkrummer"><Link to="/">Tackly Admin</Link>{segments.map((segment, index) => <span key={`${segment}-${index}`}><ChevronRight />{index === 0 && pageNames[segment] ? pageNames[segment] : index === 1 ? 'Detaljer' : segment}</span>)}</nav>
           <Link to="/users" className="topbar-search"><Search /><span>Søg brugere og annoncer</span><kbd>⌘ K</kbd></Link>
           <div className="topbar-user"><Avatar profile={profile} size="small" /><div><strong>{profile.display_name}</strong><span>{roleLabel[profile.role]}</span></div></div>
         </header>
